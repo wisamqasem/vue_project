@@ -10,37 +10,46 @@
       <label>Upload Song</label>
       <input type="file" @change="handleChange" >
       <div class="error">{{ fileError }}</div>
-
-      <button>Add</button>
+      <button v-if="!isPending">Add</button>
+      <button v-else disabled>Uploading...</button>
+      <!-- <button>Add</button> -->
     </form>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
+import useStorage from '@/composables/useStorage'
 import useDocument from '../composables/useDocument'
 
 export default {
   props: ['playlist'],
   setup(props) {
+    const { filePath, url, uploadSong } = useStorage()
+    const file = ref(null)
     const title = ref('')
     const artist = ref('')
     const showForm = ref(false)
     const fileError = ref(null)
+    const isPending = ref(false)
     const { updateDoc } = useDocument('playlists', props.playlist.id)
 
     const handleSubmit = async () => {
+        isPending.value = true
         
+     await uploadSong(file.value,props.playlist.title)
       const newSong = {
         title: title.value,
         artist: artist.value,
-        //song: 
+        songUrl: url.value,
+        filePath: filePath.value, // so we can delete it later 
         id: Math.floor(Math.random() * 1000000)
       }
       
       const res = await updateDoc({
         songs: [...props.playlist.songs, newSong]
       })
+      isPending.value = false
       title.value = ''
       artist.value = ''
     }
@@ -59,7 +68,7 @@ export default {
       }
     }
 
-    return { title, artist,fileError, showForm, handleSubmit,handleChange }
+    return { title, artist,fileError, showForm, handleSubmit,handleChange, isPending }
   }
 }
 </script>

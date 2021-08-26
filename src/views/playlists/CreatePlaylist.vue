@@ -39,14 +39,14 @@ export default {
     const handleSubmit = async () => {
       if (file.value) {
         isPending.value = true
-        await uploadImage(file.value)
+        await uploadImage(file.value,title.value)
         const res = await addDoc({
           title: title.value,
           description: description.value,
           userId: user.value.uid,
           userName: user.value.displayName,
           coverUrl: url.value,
-          filePath: filePath.value, // so we can delete it later
+          filePath: filePath.playlist, // so we can delete it later
           songs: [],
           createdAt: timestamp()
         })

@@ -17,11 +17,15 @@
     <div class="song-list">
       <div v-if="!playlist.songs.length">No songs have been added to this playlist yet.</div>
       <div v-for="song in playlist.songs" :key="song.id" class="single-song">
+          <audio controls>
+  <source :src="song.songUrl" type="audio/ogg">
+Your browser does not support the audio element.
+</audio>
         <div class="details">
           <h3>{{ song.title }}</h3>
           <p>{{ song.artist }}</p>
         </div>
-        <button v-if="ownership" @click="handleClick(song.id)">delete</button>
+        <button v-if="ownership" @click="handleClick(song.id,song.filePath)">delete</button>
       </div>
       <AddSong :playlist="playlist" />
     </div>
@@ -51,7 +55,7 @@ export default {
     const { error, document: playlist } = getDocument('playlists', props.id)
     const { user } = getUser()
     const { deleteDoc, updateDoc } = useDocument('playlists', props.id)
-    const { deleteImage } = useStorage()
+    const { deleteImage,deleteSong } = useStorage()
     const router = useRouter()
 
     const ownership = computed(() => {
@@ -66,9 +70,11 @@ export default {
       router.push({ name: 'Home' })
     }
 
-    const handleClick = async (id) => {
+    const handleClick = async (id,filePath) => {
       const songs = playlist.value.songs.filter((song) => song.id != id)
       await updateDoc({ songs })
+      console.log("filepath : ",filePath)
+      await deleteSong(filePath)
     }
 
     return { error, playlist, ownership, handleDelete, handleClick }

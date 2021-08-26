@@ -9,8 +9,9 @@ const useStorage = () => {
   const url = ref(null)
   const filePath = ref(null)
 
-  const uploadImage = async (file) => {
-    filePath.value = `covers/${user.value.uid}/${file.name}`
+  const uploadImage = async (file,playlistTitle) => {
+    filePath.value = `covers/${user.value.uid}/${playlistTitle}/${file.name}`
+    filePath.playlist=`covers/${user.value.uid}/${playlistTitle}/`
     const storageRef = projectStorage.ref(filePath.value)
 
     try {
@@ -22,8 +23,8 @@ const useStorage = () => {
     }
   }
 //new.........................................................
-  const uploadSong = async (file) => {
-    filePath.value = `covers/${user.value.uid}/${file.name}`
+  const uploadSong = async (file,playlistTitle) => {
+    filePath.value = `covers/${user.value.uid}/${playlistTitle}/${file.name}`
     const storageRef = projectStorage.ref(filePath.value)
 
     try {
@@ -35,7 +36,26 @@ const useStorage = () => {
     }
   }
 //............................................................
+//                       THIS FUNCTION DELETE A PLAYLIST FOLDER
   const deleteImage = async (path) => {
+    const storageRef = projectStorage.ref(path);
+    
+  
+    try {
+        ////// THIS FUNCTION TO DELETE A FOLDER WITH EVERY THING IN IT , IN FIREBASE STORGE.
+        await storageRef.listAll().then((listResults) => {
+        const promises = listResults.items.map((item) => {
+          return item.delete();
+        });
+        Promise.all(promises);
+      });
+     // await storageRef.delete()
+    } catch (err) {
+      console.log(err.message)
+      error.value = err
+    }
+  }
+  const deleteSong = async (path) => {
     const storageRef = projectStorage.ref(path);
 
     try {
@@ -45,8 +65,10 @@ const useStorage = () => {
       error.value = err
     }
   }
+  
 
-  return { uploadImage, uploadSong, deleteImage, url, filePath, error }
+  return { uploadImage, uploadSong, deleteImage,deleteSong, url, filePath, error }
 }
+
 
 export default useStorage;
