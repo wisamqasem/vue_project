@@ -129,4 +129,16 @@ export default {
     border-bottom: 1px dashed var(--secondary);
     margin-bottom: 20px;
   }
+
+  @media only screen and (max-width: 640px) {
+
+  .song-list {
+       grid-column: 1;
+  }
+
+  .playlist-info{
+ grid-column: 1;
+  }
+}
+
 </style>
